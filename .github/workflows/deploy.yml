@@ -1,0 +1,37 @@
+on:
+  push:
+    tags:
+      - '*'
+
+name: Deploy Extension
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      # - name: Setup yarn
+      #   uses: DerYeger/yarn-setup-action@v1.0.1
+      #   with:
+      #     node-version: 16
+      - name: pnpm install
+        run: pnpm install --frozen-lockfile
+      - name: Publish to Open VSX Registry
+        uses: HaaLeo/publish-vscode-extension@v1
+        id: publishToOpenVSX
+        with:
+          pat: ${{ secrets.OPEN_VSX_TOKEN }}
+          dependencies: false
+      - name: Publish to Visual Studio Marketplace
+        uses: HaaLeo/publish-vscode-extension@v1
+        with:
+          pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+          extensionFile: ${{ steps.publishToOpenVSX.outputs.vsixPath }}
+          dependencies: false
+          registryUrl: https://marketplace.visualstudio.com

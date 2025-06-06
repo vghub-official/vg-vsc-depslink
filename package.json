@@ -1,0 +1,144 @@
+{
+  "name": "vg-vsc-depslink",
+  "displayName": "VG Depslink",
+  "description": "Multi-language Dependency Management Extension.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.69.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "keywords": [
+    "多语言依赖链接支持（npm、Dart/Flutter、Gradle、CocoaPods、Go、Rust等）",
+    "依赖项快速链接（生成包管理仓库可点击链接）",
+    "悬停详细信息提示（版本对比、包描述、许可证、仓库链接）",
+    "可配置扩展（缓存优化、私有仓库映射、多源支持）"
+  ],
+  "homepage": "https://github.com/vghub-official/vg-vsc-depslink/blob/master/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vghub-official/vg-vsc-depslink"
+  },
+  "bugs": {
+    "url": "https://github.com/vghub-official/vg-vsc-depslink/issues"
+  },
+  "README": "README.md",
+  "publisher": "jimmyzhao",
+  "author": "jimmyzhao <zhaodongnn@gmail.com>",
+  "license": "MIT",
+  "icon": "images/logo.png",
+  "activationEvents": [
+    "workspaceContains:**/pubspec.yaml",
+    "workspaceContains:**/package.json",
+    "workspaceContains:**/Podfile",
+    "workspaceContains:**/Cargo.toml",
+    "workspaceContains:**/go.mod",
+    "workspaceContains:**/build.gradle"
+  ],
+  "pricing": "Free",
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [],
+    "menus": {},
+    "submenus": [],
+    "configuration": [
+      {
+        "title": "Vg Depslink",
+        "properties": {
+          "depslink.cacheTTL": {
+            "type": "number",
+            "default": 300000,
+            "description": "缓存时间（单位：ms）"
+          },
+          "depslink.npmRegistryUrl": {
+            "type": "string",
+            "enum": [
+              "https://www.npmjs.org/",
+              "https://www.npmmirror.com/"
+            ],
+            "enumDescriptions": [
+              "官方源（npmjs.org）",
+              "淘宝镜像（npmmirror.com）"
+            ],
+            "default": "https://www.npmmirror.com/",
+            "description": "Registry URL to be used for package link."
+          },
+          "depslink.dartRegistryUrl": {
+            "type": "string",
+            "enum": [
+              "https://pub.dev/",
+              "https://pub-web.flutter-io.cn/"
+            ],
+            "enumDescriptions": [
+              "官方源（pub.dev）",
+              "Flutter中文网镜像（pub-web.flutter-io.cn）"
+            ],
+            "default": "https://pub-web.flutter-io.cn/",
+            "description": "用于Dart和Flutter项目包链接的仓库URL"
+          },
+          "depslink.rustRegistryUrl": {
+            "type": "string",
+            "default": "https://crates.io/crates/",
+            "description": "用于Rust项目包链接的仓库URL"
+          },
+          "depslink.mavenRegistryUrl": {
+            "type": "string",
+            "default": "https://search.maven.org/artifact/",
+            "description": "用于Gradle项目包链接的基础仓库URL"
+          },
+          "depslink.goRegistryUrl": {
+            "type": "string",
+            "description": "用于Go项目包链接的公共依赖仓库基础URL",
+            "default": "https://pkg.go.dev/"
+          },
+          "depslink.goPrivateRepoMappings": {
+            "type": "object",
+            "description": "私有仓库映射配置（键为仓库前缀，值为访问 URL）",
+            "patternProperties": {
+              "^.+/$": {
+                "type": "string",
+                "description": "私有仓库的映射 URL（支持 {{repo}} 变量）"
+              }
+            },
+            "default": {
+              "git.yourdomain.com/": "https://git.yourdomain.com/{{repo}}",
+              "internal.example.com/": "https://devops.example.com/git/{{repo}}"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vsce-package": "vsce package --no-dependencies",
+    "vsce-publish": "vsce publish --no-dependencies",
+    "vscode:prepublish": "pnpm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "lint": "eslint src --ext ts",
+    "format": "prettier --loglevel warn --write \"src/**/*.{jsx,js,ts}\""
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "https": "^1.0.0",
+    "yaml": "^2.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "~16.18.34",
+    "@types/vscode": "^1.70.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.8",
+    "@typescript-eslint/parser": "^5.59.8",
+    "eslint": "^8.41.0",
+    "prettier": "^2.8.8",
+    "ts-loader": "^9.4.3",
+    "typescript": "^5.0.4",
+    "webpack": "^5.84.1",
+    "webpack-cli": "^6.0.1"
+  }
+}
