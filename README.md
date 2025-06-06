@@ -2,12 +2,14 @@
  * @Author: zdd dongdong@grizzlychina.com
  * @Date: 2025-06-03 11:42:57
  * @LastEditors: zdd dongdong@grizzlychina.com
- * @LastEditTime: 2025-06-06 12:05:44
+ * @LastEditTime: 2025-06-06 22:56:55
  * @FilePath: README.md
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 
 # VG Depslink - Multi-language Dependency Management Extension
+
+[![Ask DeepWiki](https://img.shields.io/badge/Ask%20DeepWiki-blue?logo=openai)](https://deepwiki.com/vghub-official/vg-vsc-depslink)
 
 English | [简体中文](README.zh-CN.md)
 
@@ -22,15 +24,64 @@ VG Depslink is an extension tool developed for Visual Studio Code, aiming to imp
 Supports dependency files of mainstream programming languages, automatically generating clickable links to corresponding package management repositories for dependencies (flow diagram shown below):
 
 ```mermaid
-graph LR
-  A[package.json] --> B[npmjs.com]
-  C[pubspec.yaml] --> D[pub.dev]
-  E[build.gradle] --> F[Maven Central]
-  G[Podfile] --> H[cocoapods.org]
-  I[go.mod] --> J[pkg.go.dev]
-  K[Cargo.toml] --> L[crates.io]
-  style A,C,E,G,I,K fill:#f9f,stroke:#333,stroke-width:2px
-  style B,D,F,H,J,L fill:#ccf,stroke:#333,stroke-width:2px
+flowchart TD
+    subgraph "VS Code Extension: vg-vsc-depslink"
+        A["Extension Entry Point\nsrc/extension.ts"]
+        
+        subgraph "Core Provider System"
+            B["Document Link Providers\nGenerate clickable links"]
+            C["Hover Providers\nPackage information display"]
+        end
+        
+        subgraph "Language-Specific Implementations"
+            D["NpmDependencyLinkProvider"]
+            E["PubDependencyLinkProvider"]
+            F["GradleDependencyLinkProvider"]
+            G["PodfileDependencyLinkProvider"]
+            H["GoDependencyLinkProvider"]
+            I["CargoDependencyLinker"]
+            
+            J["NpmPackageDescriptor"]
+            K["PubPackageDescriptor"]
+            L["GradlePackageDescriptor"]
+            M["PodfilePackageDescriptor"]
+            N["GoModPackageDescriptor"]
+            O["CargoPackageDescriptor"]
+        end
+    end
+    
+    subgraph "External Registries"
+        P["npmjs.com"]
+        Q["pub.dev"]
+        R["Maven Central"]
+        S["cocoapods.org"]
+        T["pkg.go.dev"]
+        U["crates.io"]
+    end
+    
+    A --> B
+    A --> C
+    
+    B --> D
+    B --> E
+    B --> F
+    B --> G
+    B --> H
+    B --> I
+    
+    C --> J
+    C --> K
+    C --> L
+    C --> M
+    C --> N
+    C --> O
+    
+    J --> P
+    K --> Q
+    L --> R
+    M --> S
+    N --> T
+    O --> U
 ```
 
 - npm: Identifies dependencies in package.json and links to npmjs.com
@@ -41,6 +92,31 @@ graph LR
 - Rust: Identifies dependencies in Cargo.toml and links to crates.io
 
 ### 2. Hover Detail Prompts
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Extension
+    participant Cache Layer
+    participant Package Registry API
+
+    User->>Extension: "Hover over dependency"
+    Extension->>Extension: "Parse dependency information"
+    Extension->>Cache Layer: "Check cache for package metadata"
+    alt Cache Hit
+        Cache Layer-->>Extension: "Return cached metadata"
+    else Cache Miss
+        Extension->>Package Registry API: "Fetch package information"
+        Package Registry API-->>Extension: "Return package metadata"
+        Extension->>Cache Layer: "Store in cache with TTL"
+    end
+    Extension->>Extension: "Format hover information"
+    Extension-->>User: "Display package details"
+
+    User->>Extension: "Click dependency link"
+    Extension->>Extension: "Generate registry URL"
+    Extension-->>User: "Open package page in browser"
+```
 
 When hovering over a dependency, the following key information is displayed (obtained by calling the corresponding repository API):
 

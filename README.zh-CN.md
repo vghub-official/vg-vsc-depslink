@@ -2,12 +2,14 @@
  * @Author: zdd dongdong@grizzlychina.com
  * @Date: 2025-06-06 11:20:55
  * @LastEditors: zdd dongdong@grizzlychina.com
- * @LastEditTime: 2025-06-06 12:06:09
+ * @LastEditTime: 2025-06-06 22:57:09
  * @FilePath: README.zh-CN.md
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 
 # VG Depslink - 多语言依赖管理扩展
+
+[![Ask DeepWiki](https://img.shields.io/badge/Ask%20DeepWiki-blue?logo=openai)](https://deepwiki.com/vghub-official/vg-vsc-depslink)
 
 [English](./README.md) | 简体中文
 
@@ -22,15 +24,64 @@ VG Depslink 是一款为 Visual Studio Code 开发的扩展工具，旨在提升
 支持主流编程语言的依赖文件，自动为依赖项生成到对应包管理仓库的可点击链接（流程图示如下）：
 
 ```mermaid
-graph LR
-  A[package.json] --> B[npmjs.com]
-  C[pubspec.yaml] --> D[pub.dev]
-  E[build.gradle] --> F[Maven Central]
-  G[Podfile] --> H[cocoapods.org]
-  I[go.mod] --> J[pkg.go.dev]
-  K[Cargo.toml] --> L[crates.io]
-  style A,C,E,G,I,K fill:#f9f,stroke:#333,stroke-width:2px
-  style B,D,F,H,J,L fill:#ccf,stroke:#333,stroke-width:2px
+flowchart TD
+    subgraph "VS Code Extension: vg-vsc-depslink"
+        A["Extension Entry Point\nsrc/extension.ts"]
+        
+        subgraph "Core Provider System"
+            B["Document Link Providers\nGenerate clickable links"]
+            C["Hover Providers\nPackage information display"]
+        end
+        
+        subgraph "Language-Specific Implementations"
+            D["NpmDependencyLinkProvider"]
+            E["PubDependencyLinkProvider"]
+            F["GradleDependencyLinkProvider"]
+            G["PodfileDependencyLinkProvider"]
+            H["GoDependencyLinkProvider"]
+            I["CargoDependencyLinker"]
+            
+            J["NpmPackageDescriptor"]
+            K["PubPackageDescriptor"]
+            L["GradlePackageDescriptor"]
+            M["PodfilePackageDescriptor"]
+            N["GoModPackageDescriptor"]
+            O["CargoPackageDescriptor"]
+        end
+    end
+    
+    subgraph "External Registries"
+        P["npmjs.com"]
+        Q["pub.dev"]
+        R["Maven Central"]
+        S["cocoapods.org"]
+        T["pkg.go.dev"]
+        U["crates.io"]
+    end
+    
+    A --> B
+    A --> C
+    
+    B --> D
+    B --> E
+    B --> F
+    B --> G
+    B --> H
+    B --> I
+    
+    C --> J
+    C --> K
+    C --> L
+    C --> M
+    C --> N
+    C --> O
+    
+    J --> P
+    K --> Q
+    L --> R
+    M --> S
+    N --> T
+    O --> U
 ```
 
 - npm ：识别 package.json 中的依赖，链接至 npmjs.com
@@ -42,6 +93,30 @@ graph LR
 
 ### 2. 悬停详细信息提示
 
+```mermaid
+sequenceDiagram
+    participant User
+    participant Extension
+    participant Cache Layer
+    participant Package Registry API
+
+    User->>Extension: "Hover over dependency"
+    Extension->>Extension: "Parse dependency information"
+    Extension->>Cache Layer: "Check cache for package metadata"
+    alt Cache Hit
+        Cache Layer-->>Extension: "Return cached metadata"
+    else Cache Miss
+        Extension->>Package Registry API: "Fetch package information"
+        Package Registry API-->>Extension: "Return package metadata"
+        Extension->>Cache Layer: "Store in cache with TTL"
+    end
+    Extension->>Extension: "Format hover information"
+    Extension-->>User: "Display package details"
+
+    User->>Extension: "Click dependency link"
+    Extension->>Extension: "Generate registry URL"
+    Extension-->>User: "Open package page in browser"
+```
 鼠标悬停在依赖项上时，显示以下关键信息（通过调用对应仓库 API 获取）：
 
 - 已安装版本与最新版本对比（标注是否可更新）

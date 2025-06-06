@@ -2,7 +2,7 @@
   "name": "vg-vsc-depslink",
   "displayName": "VG Depslink",
   "description": "Multi-language Dependency Management Extension.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.69.0"
   },
@@ -11,10 +11,15 @@
     "Snippets"
   ],
   "keywords": [
-    "多语言依赖链接支持（npm、Dart/Flutter、Gradle、CocoaPods、Go、Rust等）",
-    "依赖项快速链接（生成包管理仓库可点击链接）",
-    "悬停详细信息提示（版本对比、包描述、许可证、仓库链接）",
-    "可配置扩展（缓存优化、私有仓库映射、多源支持）"
+    "npm",
+    "Dart/Flutter",
+    "Gradle",
+    "CocoaPods",
+    "Go",
+    "Rust",
+    "依赖项快速链接",
+    "悬停详细信息提示",
+    "可配置扩展"
   ],
   "homepage": "https://github.com/vghub-official/vg-vsc-depslink/blob/master/README.md",
   "repository": {
